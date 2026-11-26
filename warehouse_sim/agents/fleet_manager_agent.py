@@ -41,6 +41,17 @@ class FleetManagerAgent(mesa.Agent):
         self.pending_assignment_deliveries: Dict[int, Dict[str, Any]] = {}
         self.assignment_retry_ticks: int = 3
 
+        # Diagnostics for explaining coordination delays/failures.
+        self.auctions_started: int = 0
+        self.auctions_timed_out: int = 0
+        self.auctions_failed: int = 0
+        self.assignment_message_retries: int = 0
+        self.assignment_rejections: int = 0
+        self.auction_durations: List[int] = []
+        self.assignment_delays: List[int] = []  # order-arrival to robot ACK
+        self.assignment_delivery_delays: List[int] = []  # committed assignment to ACK
+        self.task_wait_to_assignment_ticks: List[int] = []  # task arrival to allocation commitment
+
     # ------------------------------------------------------------------
     # ALLOCATION MODE CONFIGURATION
     # ------------------------------------------------------------------
@@ -201,6 +212,7 @@ class FleetManagerAgent(mesa.Agent):
             "status": "WAITING_FOR_BIDS",
         }
         self.pending_auctions[task_id] = auction_state
+        self.auctions_started += 1
 
         request_payload = {
             "type": "BID_REQUEST",
@@ -285,8 +297,10 @@ class FleetManagerAgent(mesa.Agent):
 
         state["status"] = "FINALIZED"
         self.pending_auctions.pop(task_id, None)
+        self.auction_durations.append(max(0, self.model.current_tick - state["started_tick"]))
 
         if winner is None:
+            self.auctions_failed += 1
             self._add_pending_task(task)
             self.model.log_message(
                 from_agent="Auction",
@@ -308,6 +322,7 @@ class FleetManagerAgent(mesa.Agent):
             or robot_state.get("status") != "IDLE"
             or robot_state.get("battery", 0.0) < 20.0
         ):
+            self.auctions_failed += 1
             self._add_pending_task(task)
             self.model.log_message(
                 from_agent="Auction",
@@ -342,6 +357,8 @@ class FleetManagerAgent(mesa.Agent):
                 len(state["received_bids"]) >= len(state["expected_robots"])
             )
             timed_out = now >= state["deadline_tick"]
+            if timed_out and not all_replies_received:
+                self.auctions_timed_out += 1
             if all_replies_received or timed_out:
                 ready_task_ids.append(task_id)
 
@@ -428,12 +445,18 @@ class FleetManagerAgent(mesa.Agent):
             if state is None or message.payload.get("robot_id") != state["robot_id"]:
                 continue
             if message.payload.get("accepted"):
+                task = state.get("task")
+                arrival_tick = getattr(task, "arrival_tick", state.get("created_tick", 0))
+                self.assignment_delays.append(max(0, self.model.current_tick - arrival_tick))
+                committed_tick = state.get("assignment_started_tick", arrival_tick)
+                self.assignment_delivery_delays.append(max(0, self.model.current_tick - committed_tick))
                 self.pending_assignment_deliveries.pop(task_id, None)
                 self.model.log_message(
                     from_agent=f"Robot-{state['robot_id']}", to_agent="FleetManager",
                     payload={"action": "assignment_acknowledged", "task_id": task_id},
                 )
             else:
+                self.assignment_rejections += 1
                 self.pending_assignment_deliveries.pop(task_id, None)
                 robot_id = state["robot_id"]
                 task = state["task"]
@@ -450,10 +473,13 @@ class FleetManagerAgent(mesa.Agent):
         for task_id, state in list(self.pending_assignment_deliveries.items()):
             last_sent = state.get("last_sent_tick", -self.assignment_retry_ticks)
             if now - last_sent >= self.assignment_retry_ticks:
+                self.assignment_message_retries += 1
                 self._send_assignment(task_id)
 
     def _execute_assignment(self, robot_id: int, task: Any) -> None:
         """Commit assignment, reserve inventory, and notify via CommunicationSystem."""
+        arrival_tick = getattr(task, "arrival_tick", self.model.current_tick)
+        self.task_wait_to_assignment_ticks.append(max(0, self.model.current_tick - arrival_tick))
         self.robot_registry[robot_id]["status"] = "BUSY"
         self.robot_registry[robot_id]["workload"] += 1
         self.robot_registry[robot_id]["current_task"] = task.task_id
@@ -476,6 +502,8 @@ class FleetManagerAgent(mesa.Agent):
             "task_payload": self._assignment_payload(task),
             "last_sent_tick": -self.assignment_retry_ticks,
             "attempts": 0,
+            "created_tick": self.model.current_tick,
+            "assignment_started_tick": self.model.current_tick,
         }
         self._send_assignment(task.task_id)
 

@@ -48,7 +48,7 @@ class InventoryAgent(mesa.Agent):
             # Each shelf holds 2 SKUs with random quantity
             assigned_skus = [skus[i % len(skus)], skus[(i + 7) % len(skus)]]
             self.shelf_state[loc] = {
-                "skus": {sku: random.randint(5, 15) for sku in assigned_skus},
+                "skus": {sku: self.model.inventory_rng.randint(5, 15) for sku in assigned_skus},
                 "reserved": False,
                 "reserved_by": None,
             }

@@ -35,8 +35,9 @@ SIMULATION_TICKS = 200
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-RAW_FILE = RESULTS_DIR / "baseline_raw_results.csv"
-SUMMARY_FILE = RESULTS_DIR / "baseline_summary.csv"
+RAW_FILE = RESULTS_DIR / "baseline_network_integrated_raw_results.csv"
+SUMMARY_FILE = RESULTS_DIR / "baseline_network_integrated_summary.csv"
+PAIRED_FILE = RESULTS_DIR / "baseline_network_integrated_paired_summary.csv"
 
 
 # 95% confidence interval t-critical values for small samples
@@ -128,10 +129,36 @@ def collect_metrics(model, algorithm, seed, ticks):
 
     active_tasks = model.order_agent.get_active_count()
 
+    communication = model.communication.get_metrics()
+    fleet = model.fleet_manager
+    assignment_delays = list(fleet.assignment_delays)
+    auction_durations = list(fleet.auction_durations)
+    assignment_delivery_delays = list(fleet.assignment_delivery_delays)
+    task_waits = list(fleet.task_wait_to_assignment_ticks)
+
     return {
         "algorithm": algorithm,
         "seed": seed,
         "simulation_ticks": ticks,
+        "messages_sent": communication.get("messages_sent", 0),
+        "messages_delivered": communication.get("messages_delivered", 0),
+        "messages_delayed": communication.get("messages_delayed", 0),
+        "messages_dropped": communication.get("messages_dropped", 0),
+        "messages_in_transit": communication.get("messages_in_transit", 0),
+        "messages_held_by_outage": communication.get("messages_held_by_outage", 0),
+        "auctions_started": fleet.auctions_started,
+        "auctions_timed_out": fleet.auctions_timed_out,
+        "auctions_failed": fleet.auctions_failed,
+        "assignment_message_retries": fleet.assignment_message_retries,
+        "assignment_rejections": fleet.assignment_rejections,
+        "mean_auction_duration_ticks": statistics.mean(auction_durations) if auction_durations else 0.0,
+        "auction_duration_observations": len(auction_durations),
+        "mean_assignment_delay_ticks": statistics.mean(assignment_delays) if assignment_delays else 0.0,
+        "assignment_delay_observations": len(assignment_delays),
+        "mean_assignment_delivery_delay_ticks": statistics.mean(assignment_delivery_delays) if assignment_delivery_delays else 0.0,
+        "assignment_delivery_delay_observations": len(assignment_delivery_delays),
+        "mean_task_wait_to_assignment_ticks": statistics.mean(task_waits) if task_waits else 0.0,
+        "task_wait_to_assignment_observations": len(task_waits),
 
         "tasks_completed": tasks_completed,
         "tasks_received": tasks_received,
@@ -285,6 +312,25 @@ SUMMARY_METRICS = [
     "shock_recovery_successes",
     "shock_recovery_failures",
     "shock_recovery_pending",
+    "messages_sent",
+    "messages_delivered",
+    "messages_delayed",
+    "messages_dropped",
+    "messages_in_transit",
+    "messages_held_by_outage",
+    "auctions_started",
+    "auctions_timed_out",
+    "auctions_failed",
+    "assignment_message_retries",
+    "assignment_rejections",
+    "mean_auction_duration_ticks",
+    "auction_duration_observations",
+    "mean_assignment_delay_ticks",
+    "assignment_delay_observations",
+    "mean_assignment_delivery_delay_ticks",
+    "assignment_delivery_delay_observations",
+    "mean_task_wait_to_assignment_ticks",
+    "task_wait_to_assignment_observations",
 ]
 
 
@@ -358,6 +404,25 @@ def calculate_summary(results):
             })
 
     return summary
+
+
+def calculate_paired_summary(results):
+    """Summarize seed-matched Auction minus Centralized differences."""
+    paired = []
+    for metric in SUMMARY_METRICS:
+        differences = []
+        for seed in SEEDS:
+            by_algorithm = {row["algorithm"]: row for row in results if row["seed"] == seed}
+            if all(algorithm in by_algorithm for algorithm in ALGORITHMS):
+                differences.append(by_algorithm["auction"][metric] - by_algorithm["centralized"][metric])
+        n = len(differences)
+        mean = statistics.mean(differences) if n else 0
+        std = statistics.stdev(differences) if n > 1 else 0
+        margin = T_CRITICAL.get(n - 1, 1.96) * std / (n ** 0.5) if n > 1 else 0
+        paired.append({"comparison": "auction_minus_centralized", "metric": metric, "runs": n,
+                      "mean_difference": mean, "std_difference": std,
+                      "ci95_lower": mean - margin, "ci95_upper": mean + margin})
+    return paired
 
 
 # ============================================================
@@ -457,11 +522,9 @@ def main():
         RAW_FILE,
     )
 
-    # 4. Export summary statistics
-    save_csv(
-        summary,
-        SUMMARY_FILE,
-    )
+    # 4. Export summary statistics and paired seed-level differences
+    save_csv(summary, SUMMARY_FILE)
+    save_csv(calculate_paired_summary(results), PAIRED_FILE)
 
     # 5. Display results
     print_summary(summary)
@@ -473,6 +536,7 @@ def main():
     print(f"Total runs: {len(results)}")
     print(f"\nRaw data : {RAW_FILE}")
     print(f"Summary  : {SUMMARY_FILE}")
+    print(f"Paired   : {PAIRED_FILE}")
 
     print("\n")
 
