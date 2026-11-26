@@ -15,6 +15,7 @@ PEAS Formulation:
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple
+from types import SimpleNamespace
 
 import mesa
 
@@ -109,10 +110,15 @@ class RobotAgent(mesa.Agent):
             urgency_score=urgency_score,
         )
 
-    def receive_assignment(self, task: Any) -> None:
-        """Receive a task assignment from the Fleet Manager."""
+    def receive_assignment(self, task: Any) -> bool:
+        """Accept an assignment once; safely acknowledge duplicate deliveries."""
+        if self.current_task is not None and getattr(self.current_task, "task_id", None) == getattr(task, "task_id", None):
+            return True
+        if self.status != "IDLE":
+            return False
         self.current_task = task
         self.status = "EN_ROUTE_TO_SHELF"
+        return True
 
 
     
@@ -126,8 +132,57 @@ class RobotAgent(mesa.Agent):
         """Hold in place (wait) — used for deadlock resolution."""
         self.path_index = max(0, self.path_index)
 
+    def _process_communication_messages(self) -> None:
+        """Process messages delivered to this robot through the communication system."""
+
+        for message in self.model.delivered_messages:
+            if message.receiver != f"Robot-{self.robot_id}":
+                continue
+
+            payload = message.payload
+
+            if payload.get("type") == "BID_REQUEST":
+                task_info = SimpleNamespace(
+                    task_id=payload["task_id"],
+                    shelf_location=tuple(payload["shelf_location"]),
+                    priority=payload.get("priority", "normal"),
+                )
+
+                bid = self.calculate_bid(task_info)
+
+                if bid is not None:
+                    self.model.communication.send(
+                        sender=f"Robot-{self.robot_id}",
+                        receiver="FleetManager",
+                        payload={
+                            "type": "BID_RESPONSE",
+                            "task_id": task_info.task_id,
+                            "robot_id": self.robot_id,
+                            "cost": bid.cost,
+                        },
+                        current_tick=self.model.current_tick,
+                    )
+
+            elif payload.get("type") == "ASSIGNMENT":
+                task_info = SimpleNamespace(**payload["task"])
+                task_info.shelf_location = tuple(task_info.shelf_location)
+                accepted = self.receive_assignment(task_info)
+                self.model.communication.send(
+                    sender=f"Robot-{self.robot_id}",
+                    receiver="FleetManager",
+                    payload={
+                        "type": "ASSIGNMENT_ACK",
+                        "task_id": task_info.task_id,
+                        "robot_id": self.robot_id,
+                        "accepted": accepted,
+                    },
+                    current_tick=self.model.current_tick,
+                )
+
     def sense(self) -> None:
-        """Broadcast telemetry to the Fleet Manager."""
+        """Process incoming messages and broadcast telemetry to the Fleet Manager."""
+        self._process_communication_messages()
+
         self.model.fleet_manager.update_telemetry(
             self.robot_id, self.pos_tuple, self.battery, self.status
         )
