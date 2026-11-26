@@ -15,11 +15,13 @@ PEAS Formulation:
 
 from __future__ import annotations
 
+
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import mesa
 
-from ..algorithms.task_allocation import allocate_task
+from ..algorithms.distributed_auction import DistributedAuction, Bid
+
 
 if TYPE_CHECKING:
     from ..model import WarehouseModel
@@ -41,6 +43,7 @@ class FleetManagerAgent(mesa.Agent):
         self.robot_registry: Dict[int, Dict[str, Any]] = {}
         self.pending_assignments: List[Any] = []
         self.tasks_in_progress: Dict[int, Any] = {}  # robot_id -> task
+        self.auction = DistributedAuction()
 
     def register_robot(self, robot_id: int, pos: Tuple[int, int]) -> None:
         """Register a new robot in the fleet registry."""
@@ -65,35 +68,69 @@ class FleetManagerAgent(mesa.Agent):
             self.robot_registry[robot_id]["battery"] = battery
             self.robot_registry[robot_id]["status"] = status
 
-    def assign_task(self, task: Any) -> bool:
-        """
-        Assign a task to the best available robot.
 
-        Uses the scored allocation function to select the optimal robot
-        based on distance, battery, workload, and task priority.
 
-        Args:
-            task: The Task object to assign.
+    def select_robot_via_auction(self, task: Any) -> Optional[int]:
+        """Collect robot-local bids and select the auction winner."""
 
-        Returns:
-            True if assignment succeeded, False if no robot available.
-        """
-        robots_info = {
-            rid: info
-            for rid, info in self.robot_registry.items()
-        }
+        bids: List[Bid] = []
 
-        is_urgent = task.priority == "urgent"
-        best_robot_id = allocate_task(
-            robots_info, task.shelf_location, is_urgent
+        for robot_id in self.robot_registry:
+
+            # Get the actual RobotAgent object
+            robot = self.model.get_robot_by_id(robot_id)
+
+            if robot is None:
+                continue
+
+            # Ask the robot to calculate its own bid
+            bid = robot.calculate_bid(task)
+
+            # Collect only valid bids
+            if bid is not None:
+                bids.append(bid)
+
+                self.model.log_message(
+                    from_agent=f"Robot-{robot_id}",
+                    to_agent="Auction",
+                    payload={
+                        "action": "bid_submitted",
+                        "task_id": task.task_id,
+                        "bid": bid.cost,
+                    },
+                )
+
+        # Select the lowest valid bid
+        winner = self.auction.select_winner(bids)
+
+        if winner is None:
+            return None
+
+        self.model.log_message(
+            from_agent="Auction",
+            to_agent=f"Robot-{winner.robot_id}",
+            payload={
+                "action": "auction_won",
+                "task_id": task.task_id,
+                "winning_bid": winner.cost,
+            },
         )
 
+        return winner.robot_id
+
+    
+
+
+
+    def assign_task(self, task: Any) -> bool:
+        """Assign a task using the distributed bidding mechanism."""
+
+        best_robot_id = self.select_robot_via_auction(task)
+
         if best_robot_id is None:
-            # No available robot — queue for later
             self.pending_assignments.append(task)
             return False
 
-        # Assign the robot
         self._execute_assignment(best_robot_id, task)
         return True
 
@@ -218,18 +255,16 @@ class FleetManagerAgent(mesa.Agent):
 
     def act(self) -> None:
         """Retry pending assignments."""
-        still_pending = []
-        for task in self._retryable_tasks:
-            robots_info = {
-                rid: info
-                for rid, info in self.robot_registry.items()
-            }
-            is_urgent = task.priority == "urgent"
-            best = allocate_task(robots_info, task.shelf_location, is_urgent)
 
-            if best is not None:
-                self._execute_assignment(best, task)
-                if task in self.pending_assignments:
-                    self.pending_assignments.remove(task)
+        still_pending = []
+
+        for task in self._retryable_tasks:
+
+            best_robot_id = self.select_robot_via_auction(task)
+
+            if best_robot_id is not None:
+                self._execute_assignment(best_robot_id, task)
             else:
                 still_pending.append(task)
+
+        self._retryable_tasks = still_pending
