@@ -1,11 +1,13 @@
+
 """
 Tests for Task Allocation Scoring Function.
 
 Validates:
-1. Low-battery robot is never assigned a distant task when a closer,
-   fuller-battery robot is idle.
-2. Urgent tasks get a priority bonus.
-3. Scoring function produces consistent orderings.
+1. Closer robots receive lower scores.
+2. Higher-battery robots receive lower scores.
+3. Workload does not affect the common scoring formula.
+4. Urgent tasks receive a priority bonus.
+5. Task allocation respects robot availability and battery thresholds.
 """
 
 import pytest
@@ -43,8 +45,8 @@ class TestScoreRobot:
         )
         assert high_batt < low_batt
 
-    def test_lower_workload_scores_lower(self):
-        """A robot with fewer tasks should score lower (better)."""
+    def test_workload_does_not_affect_score(self):
+        """Workload is excluded from the common scoring formula."""
         light = score_robot(
             robot_pos=(0, 0), robot_battery=80.0,
             robot_workload=0, task_location=(5, 5), is_urgent=False,
@@ -53,7 +55,7 @@ class TestScoreRobot:
             robot_pos=(0, 0), robot_battery=80.0,
             robot_workload=3, task_location=(5, 5), is_urgent=False,
         )
-        assert light < heavy
+        assert light == heavy
 
     def test_urgent_bonus_lowers_score(self):
         """Urgent tasks get a priority bonus (lower score)."""
@@ -84,7 +86,7 @@ class TestAllocateTask:
         """A robot below the battery threshold is not assigned."""
         robots = {
             0: {"pos": (1, 0), "battery": 10.0, "status": "IDLE", "workload": 0},
-            1: {"pos": (10, 0), "battery": 80.0, "status": "IDLE", "workload": 0},
+                1: {"pos": (10, 0), "battery": 80.0, "status": "IDLE", "workload": 0},
         }
         best = allocate_task(robots, task_location=(2, 0), is_urgent=False)
         assert best == 1  # Robot 0 excluded due to low battery

@@ -32,6 +32,7 @@ from .agents.inventory_agent import InventoryAgent
 from .agents.order_agent import OrderAgent
 from .agents.robot_agent import RobotAgent
 from .agents.traffic_controller_agent import TrafficControllerAgent
+from .communication import CommunicationSystem
 
 
 
@@ -79,12 +80,13 @@ class WarehouseModel(mesa.Model):
     Uses staged execution: sense → decide → act per tick.
     """
 
-    def __init__(self, seed: Optional[int] = None) -> None:
+    def __init__(self, seed: Optional[int] = None, num_robots: int = NUM_ROBOTS) -> None:
         """Initialize the warehouse model with all agents and grid layout."""
         super().__init__()
 
 
 
+        self.num_robots = num_robots
         self.grid_width = GRID_WIDTH
         self.grid_height = GRID_HEIGHT
         self.grid = mesa.space.MultiGrid(GRID_WIDTH, GRID_HEIGHT, torus=False)
@@ -97,6 +99,8 @@ class WarehouseModel(mesa.Model):
         self.packing_station = PACKING_STATION
         self.charging_docks = list(CHARGING_DOCKS)
         self.message_log: List[Dict[str, Any]] = []
+        self.communication = CommunicationSystem()
+        self.delivered_messages = []
 
         # Environmental shock tracking
         self.shocks_triggered: int = 0
@@ -133,8 +137,13 @@ class WarehouseModel(mesa.Model):
 
         # ── Instantiate robot agents ──────────────────────────────────
         self.robots: Dict[int, RobotAgent] = {}
-        for i in range(NUM_ROBOTS):
-            start_pos = ROBOT_START_POSITIONS[i % len(ROBOT_START_POSITIONS)]
+        extra_positions = [
+            (0, y) for y in range(GRID_HEIGHT)
+            if (0, y) not in ROBOT_START_POSITIONS
+        ]
+        all_start_positions = ROBOT_START_POSITIONS + extra_positions
+        for i in range(self.num_robots):
+            start_pos = all_start_positions[i % len(all_start_positions)]
             robot = RobotAgent(self, robot_id=i, start_pos=start_pos)
             self.robots[i] = robot
             self.fleet_manager.register_robot(i, start_pos)
@@ -176,6 +185,8 @@ class WarehouseModel(mesa.Model):
         Stage 3 — ACT: All agents execute their actions.
         """
         self.current_tick += 1
+
+        self.delivered_messages = self.communication.deliver_due(self.current_tick)
 
 
 

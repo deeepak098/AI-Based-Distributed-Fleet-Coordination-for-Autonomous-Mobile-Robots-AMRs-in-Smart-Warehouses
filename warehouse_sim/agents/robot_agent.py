@@ -66,8 +66,9 @@ class RobotAgent(mesa.Agent):
 
 
 
+
     def calculate_bid(self, task: Any) -> Optional[Any]:
-        """Calculate this robot's bid for a task."""
+        """Calculate this robot's bid using the common scoring formula."""
 
         # Only idle robots are allowed to bid
         if self.status != "IDLE":
@@ -77,31 +78,35 @@ class RobotAgent(mesa.Agent):
         if self.battery < BATTERY_LOW_THRESHOLD:
             return None
 
-        # Calculate distance from robot to shelf
+        # Calculate Manhattan distance from robot to task shelf
         distance = (
             abs(self.pos_tuple[0] - task.shelf_location[0])
             + abs(self.pos_tuple[1] - task.shelf_location[1])
         )
 
-        # Normalize distance to a score between 0 and 1
+        # Normalize distance between 0 and 1
         distance_score = min(distance / 38.0, 1.0)
 
-        # Battery risk score
+        # Battery penalty: lower battery means higher cost
         energy_score = 1.0 - (self.battery / 100.0)
 
-        # Idle robots currently have zero workload
-        workload_score = 0.0
+        # Determine task urgency
+        urgency_score = (
+            1.0 if str(task.priority).lower() == "urgent" else 0.0
+        )
 
+        # Create auction instance
         from ..algorithms.distributed_auction import DistributedAuction
 
         auction = DistributedAuction()
 
+        # Submit bid using the common scoring formula
         return auction.calculate_bid(
             robot_id=self.robot_id,
             task_id=task.task_id,
             distance_score=distance_score,
             energy_score=energy_score,
-            workload_score=workload_score,
+            urgency_score=urgency_score,
         )
 
     def receive_assignment(self, task: Any) -> None:
