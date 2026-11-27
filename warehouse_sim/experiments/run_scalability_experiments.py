@@ -14,8 +14,8 @@ SIMULATION_TICKS = 200
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-RAW_FILE = RESULTS_DIR / "scalability_raw_results.csv"
-SUMMARY_FILE = RESULTS_DIR / "scalability_summary.csv"
+RAW_FILE = RESULTS_DIR / "network_integrated_scalability_raw_results.csv"
+SUMMARY_FILE = RESULTS_DIR / "network_integrated_scalability_summary.csv"
 
 METRICS = [
     "tasks_completed",
@@ -25,6 +25,24 @@ METRICS = [
     "collision_count",
     "deadlocks_resolved",
     "reroutes",
+    "messages_sent",
+    "messages_delivered",
+    "messages_delayed",
+    "messages_dropped",
+    "messages_in_transit",
+    "messages_held_by_outage",
+    "auctions_started",
+    "auctions_timed_out",
+    "auctions_failed",
+    "assignment_message_retries", "assignment_rejections",
+    "mean_auction_duration_ticks",
+    "auction_duration_observations",
+    "mean_assignment_delay_ticks",
+    "assignment_delay_observations",
+    "mean_assignment_delivery_delay_ticks",
+    "assignment_delivery_delay_observations",
+    "mean_task_wait_to_assignment_ticks",
+    "task_wait_to_assignment_observations",
 ]
 
 T_CRITICAL = {

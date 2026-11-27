@@ -80,13 +80,20 @@ class WarehouseModel(mesa.Model):
     Uses staged execution: sense → decide → act per tick.
     """
 
-    def __init__(self, seed: Optional[int] = None, num_robots: int = NUM_ROBOTS) -> None:
+    def __init__(self, seed: Optional[int] = None, num_robots: int = NUM_ROBOTS,
+                 latency_ticks: int = 0, outage_start: Optional[int] = None,
+                 outage_end: Optional[int] = None) -> None:
         """Initialize the warehouse model with all agents and grid layout."""
         super().__init__()
 
 
 
         self.num_robots = num_robots
+        # Independent random streams prevent allocation behavior from changing
+        # exogenous customer demand and initial inventory through shared RNG use.
+        self.workload_rng = random.Random(seed)
+        self.inventory_rng = random.Random(seed)
+        self.event_rng = random.Random(seed)
         self.grid_width = GRID_WIDTH
         self.grid_height = GRID_HEIGHT
         self.grid = mesa.space.MultiGrid(GRID_WIDTH, GRID_HEIGHT, torus=False)
@@ -99,7 +106,11 @@ class WarehouseModel(mesa.Model):
         self.packing_station = PACKING_STATION
         self.charging_docks = list(CHARGING_DOCKS)
         self.message_log: List[Dict[str, Any]] = []
-        self.communication = CommunicationSystem()
+        self.communication = CommunicationSystem(
+            latency_ticks=latency_ticks,
+            outage_start=outage_start,
+            outage_end=outage_end,
+        )
         self.delivered_messages = []
 
         # Environmental shock tracking

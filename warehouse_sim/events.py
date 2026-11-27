@@ -363,8 +363,8 @@ def flood_urgent_orders(model: WarehouseModel, n: int = 10) -> Dict[str, Any]:
 
     orders_created = 0
     for _ in range(n):
-        sku = random.choice(skus)
-        qty = random.randint(1, 2)
+        sku = model.event_rng.choice(skus)
+        qty = model.event_rng.randint(1, 2)
         model.order_agent.receive_order(sku, qty, "urgent")
         orders_created += 1
 

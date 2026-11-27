@@ -1,0 +1,11 @@
+algorithm,seed,simulation_ticks,messages_sent,messages_delivered,messages_delayed,messages_dropped,messages_in_transit,messages_held_by_outage,auctions_started,auctions_timed_out,auctions_failed,assignment_message_retries,assignment_rejections,mean_auction_duration_ticks,auction_duration_observations,mean_assignment_delay_ticks,assignment_delay_observations,mean_assignment_delivery_delay_ticks,assignment_delivery_delay_observations,mean_task_wait_to_assignment_ticks,task_wait_to_assignment_observations,tasks_completed,tasks_received,pending_tasks,active_tasks,throughput,average_battery,robots_charging,collision_count,deadlocks_resolved,reroutes,shocks_triggered,shock_recovery_successes,shock_recovery_failures,shock_recovery_pending
+centralized,42,200,102,101,0,0,1,0,0,0,0,0,0,0.0,0,5,50,2,50,2.9607843137254903,51,47,70,19,4,0.235,26.6,0,0,0,0,0,0,0,0
+auction,42,200,980,971,0,0,9,0,153,0,103,0,0,2,151,12.48936170212766,47,2,47,10.541666666666666,48,46,70,20,4,0.23,22.4,0,0,1,0,0,0,0,0
+centralized,123,200,125,123,0,0,2,0,0,0,0,0,0,0.0,0,17.37704918032787,61,2,61,14.920634920634921,63,58,79,17,4,0.29,48.8,0,0,1,0,0,0,0,0
+auction,123,200,1281,1273,0,0,8,0,267,0,204,0,0,2,265,29.116666666666667,60,2,60,26.868852459016395,61,55,79,17,7,0.275,92.4,0,0,1,0,0,0,0,0
+centralized,456,200,24,24,0,0,0,0,0,0,0,0,0,0.0,0,13.25,12,2,12,11.25,12,3,77,68,6,0.015,58.4,1,0,182,0,0,0,0,0
+auction,456,200,192,192,0,0,0,0,72,0,60,0,0,2,72,26.666666666666668,12,2,12,24.666666666666668,12,3,77,67,7,0.015,77.0,0,0,180,0,0,0,0,0
+centralized,789,200,130,130,0,0,0,0,0,0,0,0,0,0.0,0,6.030769230769231,65,2,65,4.030769230769231,65,59,74,11,4,0.295,72.8,0,0,0,0,0,0,0,0
+auction,789,200,1151,1149,0,0,2,0,276,0,212,0,0,2,274,20.06451612903226,62,2,62,18.06451612903226,62,53,74,12,9,0.265,75.6,0,0,0,0,0,0,0,0
+centralized,1001,200,112,111,0,0,1,0,0,0,0,0,0,0.0,0,9.181818181818182,55,2,55,7.071428571428571,56,50,66,12,4,0.25,83.6,0,0,0,0,0,0,0,0
+auction,1001,200,1172,1170,0,0,2,0,204,0,150,0,0,2,203,16.41509433962264,53,2,53,14.415094339622641,53,50,66,14,2,0.25,26.4,2,0,0,0,0,0,0,0

@@ -50,7 +50,7 @@ class CustomerAgent(mesa.Agent):
 
     def _sample_interval(self) -> int:
         """Sample the next order interval from a Poisson distribution."""
-        return max(1, int(random.expovariate(1.0 / ORDER_INTERVAL_LAMBDA)))
+        return max(1, int(self.model.workload_rng.expovariate(1.0 / ORDER_INTERVAL_LAMBDA)))
 
     def sense(self) -> None:
         """Observe the current order queue length."""
@@ -66,9 +66,9 @@ class CustomerAgent(mesa.Agent):
         if not self.should_place_order:
             return
 
-        sku = random.choice(AVAILABLE_SKUS)
-        qty = random.randint(1, 3)
-        priority = "urgent" if random.random() < URGENT_PROBABILITY else "normal"
+        sku = self.model.workload_rng.choice(AVAILABLE_SKUS)
+        qty = self.model.workload_rng.randint(1, 3)
+        priority = "urgent" if self.model.workload_rng.random() < URGENT_PROBABILITY else "normal"
 
         self.model.order_agent.receive_order(sku, qty, priority)
         self.orders_placed += 1
