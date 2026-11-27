@@ -1,7 +1,7 @@
 """
 Warehouse Simulation Engine — Mesa Model orchestrating all agents.
 
-Owner: Rohith (cb.sc.u4cse23018) & Kalyan (cb.sc.u4cse23060)
+Owner: Deepak (cb.sc.u4cse23019) & Kalyan (cb.sc.u4cse23050)
 Responsibility: Holds the 20x20 MultiGrid, instantiates all agent types,
 runs the staged scheduler (sense → decide → act), collects metrics via
 DataCollector, and logs inter-agent messages to simulation_log.jsonl.
