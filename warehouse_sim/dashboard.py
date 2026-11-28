@@ -28,33 +28,42 @@ st.set_page_config(
 )
 
 
-st.markdown("""\n<style>
+st.markdown("""
+<style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-:root { --bg:#080d15; --panel:#101a28; --border:#223149; --muted:#9aa9bd; --cyan:#5be7c4; }
-.stApp { background:radial-gradient(circle at 85% -10%,#172a49 0,transparent 36%),var(--bg); }
-[data-testid="stSidebar"] { background:#0a111b; border-right:1px solid var(--border); }
-.block-container { max-width:1550px; padding-top:1.4rem; padding-bottom:2rem; }
-h1,h2,h3 { font-family:'Space Grotesk',sans-serif !important; letter-spacing:-.025em; }
+:root { --bg:#070b12; --panel:#101824; --panel2:#131e2c; --border:#263548; --muted:#98a8bc; --cyan:#54e0c0; --blue:#75a7ff; }
+.stApp { background:radial-gradient(circle at 80% -15%,#1a3150 0,transparent 32%),linear-gradient(180deg,#080d15,#070b12 75%); color:#eaf1fb; }
+[data-testid="stSidebar"] { background:linear-gradient(180deg,#0a111b,#080d14); border-right:1px solid var(--border); }
+[data-testid="stSidebar"] > div:first-child { padding-top:1.4rem; }
+.block-container { max-width:1600px; padding-top:1.25rem; padding-bottom:2.5rem; }
+h1,h2,h3 { font-family:'Space Grotesk',sans-serif !important; letter-spacing:-.035em; color:#f0f5fc; }
 body,p,div,label,button { font-family:'DM Sans',sans-serif; }
-.eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.16em; font-size:.74rem; font-weight:700; }
-.hero { background:linear-gradient(120deg,#14253d,#0d1624 70%); border:1px solid #263b56; border-radius:22px; padding:2.3rem 2.5rem; }
-.hero h1 { font-size:clamp(2rem,4.5vw,4.3rem); line-height:1.02; margin:.5rem 0 1rem; }
-.hero p { color:#b0bed1; max-width:850px; line-height:1.7; font-size:1.02rem; }
-.panel { background:#0e1724; border:1px solid #213149; border-radius:16px; padding:1.15rem 1.3rem; height:100%; }
-.panel p { color:#a0aec2; line-height:1.55; }
-.pill { display:inline-block; padding:.35rem .65rem; margin:.2rem .2rem .2rem 0; border:1px solid #2c405a; border-radius:999px; color:#b7c5d9; font-size:.78rem; }
-.flow { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.65rem; margin:.8rem 0 1rem; }
-.flow-item { border:1px solid #263750; background:#0e1724; border-radius:13px; padding:.95rem; }
-.flow-item strong { display:block; color:#e9f0fa; }
-.flow-item span { color:#9aa9bd; font-size:.82rem; line-height:1.45; display:block; margin-top:.35rem; }
-.logline { border-bottom:1px solid #1c2a3b; padding:.55rem 0; color:#a5b4c8; font-family:ui-monospace,monospace; font-size:.78rem; }
+.eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.18em; font-size:.72rem; font-weight:800; }
+.hero { background:linear-gradient(125deg,rgba(22,43,67,.98),rgba(12,20,32,.97) 68%),#101824; border:1px solid #2a4562; border-radius:24px; padding:2.5rem 2.7rem; box-shadow:0 18px 55px rgba(0,0,0,.22); position:relative; overflow:hidden; }
+.hero:after { content:''; position:absolute; width:240px; height:240px; border-radius:50%; border:1px solid rgba(84,224,192,.12); right:-80px; top:-90px; box-shadow:0 0 0 28px rgba(84,224,192,.025),0 0 0 56px rgba(84,224,192,.02); }
+.hero h1 { font-size:clamp(2.1rem,4.5vw,4.25rem); line-height:1.02; margin:.55rem 0 1rem; max-width:950px; }
+.hero p { color:#b4c2d5; max-width:900px; line-height:1.72; font-size:1.04rem; }
+.panel { background:linear-gradient(145deg,#121e2c,#0d1520); border:1px solid #24354a; border-radius:18px; padding:1.25rem 1.4rem; height:100%; box-shadow:0 8px 24px rgba(0,0,0,.12); transition:border-color .2s ease,transform .2s ease; }
+.panel:hover { border-color:#36516d; transform:translateY(-2px); }
+.panel p { color:#a4b4c8; line-height:1.6; }
+.pill { display:inline-block; padding:.38rem .72rem; margin:.22rem .22rem .22rem 0; border:1px solid #35506b; background:rgba(15,25,39,.7); border-radius:999px; color:#c4d2e4; font-size:.78rem; }
+.flow { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.75rem; margin:.9rem 0 1.1rem; }
+.flow-item { border:1px solid #263a52; background:linear-gradient(145deg,#111d2b,#0c1420); border-radius:15px; padding:1.05rem; min-height:112px; }
+.flow-item strong { display:block; color:#eaf2fc; font-size:.95rem; }
+.flow-item span { color:#9eafc4; font-size:.83rem; line-height:1.5; display:block; margin-top:.42rem; }
+.logline { border-bottom:1px solid #1b2a3b; padding:.65rem 0; color:#a8b8cc; font-family:ui-monospace,monospace; font-size:.78rem; }
 .logline b { color:var(--cyan); }
-div[data-testid="stMetric"] { background:#101a28; border:1px solid #24344a; padding:.8rem 1rem; border-radius:14px; }
-div[data-testid="stMetricValue"] { color:#eef4fc; }
-.stButton button { border-radius:10px; border:1px solid #2a405c; }
-@media(max-width:900px){ .flow { grid-template-columns:1fr; } .hero { padding:1.5rem; } }
+div[data-testid="stMetric"] { background:linear-gradient(145deg,#142235,#0e1723); border:1px solid #2a3e56; padding:.9rem 1.05rem; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.14); }
+div[data-testid="stMetricLabel"] { color:#a7b8cc; }
+div[data-testid="stMetricValue"] { color:#f1f6ff; font-family:'Space Grotesk',sans-serif; }
+.stButton button { border-radius:11px; border:1px solid #2d4560; font-weight:650; transition:all .15s ease; }
+.stButton button:hover { border-color:#54e0c0; color:#54e0c0; }
+[data-testid="stTabs"] button { border-radius:10px; }
+[data-testid="stExpander"] { background:#0e1723; border:1px solid #26384d; border-radius:14px; }
+hr { border-color:#243449 !important; }
+@media(max-width:900px){ .flow { grid-template-columns:1fr; } .hero { padding:1.6rem; } }
 </style>
-""", unsafe_allow_html=True)
+""", unsafe_allow_html=True);
 
 
 def reset_state() -> None:
@@ -140,8 +149,8 @@ def render_map() -> go.Figure:
 # ── Sidebar: global controls ────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="eyebrow">NEXUS · DT-01</div>', unsafe_allow_html=True)
-    st.title("Demo controls")
-    st.caption("Use this panel to control the simulation from any section.")
+    st.title("Simulation console")
+    st.caption("Navigate sections and control the live simulation here.")
     page = st.radio("Go to section", ["Demo Guide", "Live Warehouse", "System Architecture", "Resilience Lab", "Evidence"], label_visibility="collapsed")
     st.divider()
     run_col, pause_col = st.columns(2)
@@ -164,9 +173,9 @@ with st.sidebar:
 
 # ── Page: Demo guide ────────────────────────────────────────────────
 if page == "Demo Guide":
-    st.markdown("""<section class="hero"><div class="eyebrow">Viva-ready · Multi-agent simulation</div>
-    <h1>A warehouse that coordinates before it moves.</h1>
-    <p>NEXUS is a software simulation of a smart warehouse. Orders become tasks, a Fleet Manager allocates work, robots navigate and execute tasks, and specialized agents respond to changing conditions. Use the guided sequence below to present the project clearly.</p>
+    st.markdown("""<section class="hero"><div class="eyebrow">Live project demonstration · Multi-agent simulation</div>
+    <h1>Intelligent coordination for a smarter warehouse.</h1>
+    <p>NEXUS is a software simulation of a smart warehouse. Orders become tasks, a Fleet Manager allocates work, robots navigate and execute tasks, and specialized agents respond to changing conditions. Explore the workflow, live coordination, and recovery behavior of the simulated warehouse.</p>
     <span class="pill">20 × 20 grid</span><span class="pill">5 robots</span><span class="pill">7 agent roles</span><span class="pill">5 disruption scenarios</span></section>""", unsafe_allow_html=True)
     st.subheader("The warehouse workflow")
     st.markdown("""<div class="flow">
@@ -176,7 +185,7 @@ if page == "Demo Guide":
     <div class="flow-item"><strong>04 · Navigation</strong><span>Pathfinding and traffic logic guide movement.</span></div>
     <div class="flow-item"><strong>05 · Fulfillment</strong><span>Robots execute tasks and report status.</span></div>
     </div>""", unsafe_allow_html=True)
-    st.subheader("Suggested live demo sequence")
+    st.subheader("Demo walkthrough")
     steps = [
         ("1", "Introduce the project", "Use this page to explain the problem and the order-to-fulfillment flow."),
         ("2", "Show the agents", "Open System Architecture and briefly describe each agent's responsibility."),
@@ -189,12 +198,12 @@ if page == "Demo Guide":
     for i, (num, title_text, description) in enumerate(steps):
         with cols[i % 3]:
             st.markdown(f'<div class="panel"><div class="eyebrow">Step {num}</div><h3>{title_text}</h3><p>{description}</p></div>', unsafe_allow_html=True)
-    st.info("Viva tip: Keep the simulation pace at 1 tick per refresh. Demonstrate one disruption well rather than clicking every scenario.")
+    st.info("Demo note: Keep the simulation pace at 1 tick per refresh. A single disruption is enough to showcase the system response.")
 
 
 # ── Page: Live warehouse ────────────────────────────────────────────
 elif page == "Live Warehouse":
-    heading("Live operation", "Watch the warehouse run", "The map and KPIs below are read from the running model. Start, pause, or advance one tick using the sidebar controls.")
+    heading("Live operation", "Live warehouse operations", "The map and KPIs below are read from the running model. Start, pause, or advance one tick using the sidebar controls.")
     k = model.get_kpis()
     metric_cols = st.columns(6)
     for col, (label, value) in zip(metric_cols, [
@@ -229,7 +238,7 @@ elif page == "Live Warehouse":
 
 # ── Page: Architecture ───────────────────────────────────────────────
 elif page == "System Architecture":
-    heading("System design", "Who does what?", "Each agent has a specialized responsibility. The WarehouseModel coordinates the simulation lifecycle and holds the shared warehouse state.")
+    heading("System design", "Multi-agent system architecture", "Each agent has a specialized responsibility. The WarehouseModel coordinates the simulation lifecycle and holds the shared warehouse state.")
     agents = [
         ("Customer Agent", "Creates incoming customer demand/orders."),
         ("Order Agent", "Prioritizes orders and manages the task lifecycle."),
@@ -252,7 +261,7 @@ elif page == "System Architecture":
 
 # ── Page: Resilience Lab ────────────────────────────────────────────
 elif page == "Resilience Lab":
-    heading("Controlled disruption testing", "Introduce a problem. Observe the response.", "Inject one scenario at a time. For a clean demo, run the model for a few ticks, pause, inject the event, then resume and inspect the recovery record.")
+    heading("Controlled disruption testing", "Test a disruption. Observe the response.", "Inject one scenario at a time. For a clean demo, run the model for a few ticks, pause, inject the event, then resume and inspect the recovery record.")
     st.caption("These controls modify the live model. Reset simulation from the sidebar if you want to start over.")
     alive = [robot_id for robot_id, robot in model.robots.items() if robot.status != "FAILED"]
     tabs = st.tabs(["Robot failure", "Blocked aisle", "Battery drain", "Urgent orders", "Deadlock"])
@@ -294,7 +303,7 @@ elif page == "Resilience Lab":
 
 # ── Page: Evidence ─────────────────────────────────────────────────
 elif page == "Evidence":
-    heading("Evaluation", "Evidence from the simulation", "Use the current run's metrics to discuss system behavior. These are live session values, not pre-filled demonstration results.")
+    heading("Evaluation", "Simulation performance & evidence", "Use the current run's metrics to discuss system behavior. These are live session values, not pre-filled demonstration results.")
     k = model.get_kpis()
     cols = st.columns(4)
     for col, (label, value) in zip(cols, [
@@ -307,11 +316,11 @@ elif page == "Evidence":
         st.markdown('<div class="panel"><div class="eyebrow">Automated tests</div><h3>What we validate</h3><p>Pathfinding correctness · CBS conflict handling · task allocation scoring · deadlock detection/recovery · longer stability runs · disruption scenarios.</p></div>', unsafe_allow_html=True)
     with right:
         st.markdown('<div class="panel"><div class="eyebrow">Run locally</div><h3>Project commands</h3><p><code>python -m pytest warehouse_sim/tests -q</code><br/><br/><code>streamlit run warehouse_sim/dashboard.py</code></p></div>', unsafe_allow_html=True)
-    st.subheader("Before the viva")
-    st.markdown("- Reset to a fresh seed-42 simulation.\n- Keep simulation pace at 1.\n- Start on Demo Guide.\n- Demonstrate one disruption cleanly.\n- Avoid claiming guaranteed recovery; show the recorded status.")
+    st.subheader("Demo setup")
+    st.markdown("- Reset to a fresh seed-42 simulation.\n- Keep simulation pace at 1.\n- Start from Demo Guide.\n- Introduce one disruption and monitor the response.\n- Use the recorded status and live metrics as evidence.")
 
 
-st.markdown("<div style='text-align:center;color:#75849b;padding:1.5rem 0'>NEXUS · Warehouse Digital Twin · Viva Demonstration Interface</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center;color:#75849b;padding:1.5rem 0'>NEXUS · Warehouse Digital Twin · Live Project Demonstration</div>", unsafe_allow_html=True)
 
 
 if st.session_state.running:
