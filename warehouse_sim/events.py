@@ -1,15 +1,3 @@
-"""
-Environmental Shocks — Stress-test functions for live demo scenarios.
-
-Owner: Venkat (cb.sc.u4cse23055) — Operations
-Responsibility: Implements 5 callable shock functions that can be triggered
-live during the demo to test the system's dynamic replanning and recovery.
-
-Shock recovery is tracked separately from shock injection. A shock is registered
-as PENDING and is only counted as RECOVERED when its recovery condition is
-observed. Asynchronous shocks can be checked by calling
-monitor_shock_recoveries(model) after each simulation tick.
-"""
 
 from __future__ import annotations
 

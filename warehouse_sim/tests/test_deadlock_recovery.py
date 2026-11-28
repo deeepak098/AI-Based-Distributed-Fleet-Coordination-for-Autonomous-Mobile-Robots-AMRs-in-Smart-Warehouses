@@ -1,11 +1,3 @@
-"""
-Tests for Deadlock Detection and Resolution.
-
-Validates:
-1. Wait-for cycle is detected correctly.
-2. Deadlock is resolved by rolling back the lowest-priority robot.
-3. No false positives on acyclic wait-for graphs.
-"""
 
 import pytest
 

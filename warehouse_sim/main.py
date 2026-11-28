@@ -1,16 +1,4 @@
-"""
-CLI Entry Point — Runs the warehouse simulation for N ticks and prints KPIs.
 
-Owner: Rohith (cb.sc.u4cse23018) — Robot Intelligence
-Responsibility: Boots the full simulation with a single `python main.py`
-command, runs for a configurable number of ticks, and prints a summary
-of key performance indicators.
-
-Usage:
-    python -m warehouse_sim.main              # Run 200 ticks (default)
-    python -m warehouse_sim.main --ticks 500  # Run 500 ticks
-    python -m warehouse_sim.main --shock      # Run with shocks injected
-"""
 
 from __future__ import annotations
 

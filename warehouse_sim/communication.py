@@ -1,4 +1,3 @@
-"""Tick-based simulated communication system for warehouse agents."""
 
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional

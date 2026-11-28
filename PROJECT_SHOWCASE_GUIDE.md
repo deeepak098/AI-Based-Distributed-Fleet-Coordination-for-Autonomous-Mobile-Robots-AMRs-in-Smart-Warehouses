@@ -660,14 +660,6 @@ Used responsibly, ideas from this project can contribute to safer work, more rel
 
 ---
 
-## 22. Team Responsibilities
-
-| Member | Identifier | Main responsibility |
-|---|---|---|
-| Rohith | cb.sc.u4cse23018 | Robot intelligence, A-star, CBS, Robot Agent |
-| Kalyan | cb.sc.u4cse23060 | Warehouse intelligence, order/inventory agents, task allocation |
-| Venkat | cb.sc.u4cse23055 | Operations, Traffic Controller, Charging Agent, events |
-| Vishnu | cb.sc.u4cse23056 | Digital-twin dashboard, analytics, and telemetry |
 
 ---
 

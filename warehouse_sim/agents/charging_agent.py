@@ -1,16 +1,3 @@
-"""
-Charging Agent — Manages charging dock allocation and robot battery recovery.
-
-Owner: Venkat (cb.sc.u4cse23055) — Operations
-Responsibility: Monitors fleet battery levels, assigns nearest free charging
-dock, and manages queue when all docks are occupied.
-
-PEAS Formulation:
-    Performance: No robot ever hits 0% mid-task, charger utilization balance.
-    Environment: Charging station occupancy, fleet battery levels.
-    Actuators: queue_for_charge(), release_from_charge().
-    Sensors: Battery telemetry broadcast from Fleet Manager.
-"""
 
 from __future__ import annotations
 

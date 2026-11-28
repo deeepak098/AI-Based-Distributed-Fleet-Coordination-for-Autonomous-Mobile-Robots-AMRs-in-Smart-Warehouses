@@ -1,17 +1,4 @@
-"""
-Inventory Management Agent — Tracks shelf stock and handles reservations.
 
-Owner: Kalyan (cb.sc.u4cse23060) — Warehouse Intelligence
-Responsibility: Maintains ground-truth shelf state (SKU, quantity, reserved flag),
-resolves SKU lookups to shelf locations, and manages reservations that directly
-impact Traffic Controller's routing decisions (cross-agent causality).
-
-PEAS Formulation:
-    Performance: Correct shelf resolution, stock accuracy, zero false "in-stock" reports.
-    Environment: Shelf/stock ground-truth table, warehouse map.
-    Actuators: reserve_stock(), update_shelf_state().
-    Sensors: Shelf occupancy, incoming task requests.
-"""
 
 from __future__ import annotations
 

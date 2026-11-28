@@ -1,16 +1,4 @@
-"""
-Traffic Controller Agent — Manages multi-robot path planning and reservations.
 
-Owner: Venkat (cb.sc.u4cse23055) — Operations
-Responsibility: Owns the space-time reservation table, plans routes using A*,
-escalates to CBS on conflict, and reroutes robots when aisles are blocked.
-
-PEAS Formulation:
-    Performance: Zero collisions, zero deadlocks, minimized total path cost.
-    Environment: Grid map, reservation table, other robots' planned paths.
-    Actuators: plan_route(), reroute(), hold_at_node().
-    Sensors: Robot positions, aisle-block events, active reservations.
-"""
 
 from __future__ import annotations
 

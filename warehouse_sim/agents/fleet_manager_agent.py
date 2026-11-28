@@ -1,10 +1,3 @@
-"""
-Fleet Manager Agent — Assigns robots to tasks using selectable allocation algorithms.
-
-Auction mode now uses the model CommunicationSystem for bid requests and bid
-responses. The Fleet Manager still centrally coordinates the auction and commits
-the winning assignment; this is message-based bidding, not peer-to-peer consensus.
-"""
 
 from __future__ import annotations
 

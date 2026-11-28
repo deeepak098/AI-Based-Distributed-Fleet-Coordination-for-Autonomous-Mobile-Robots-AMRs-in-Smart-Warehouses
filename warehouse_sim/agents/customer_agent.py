@@ -1,16 +1,4 @@
-"""
-Customer Agent — Generates realistic order streams for the warehouse.
 
-Owner: Kalyan (cb.sc.u4cse23060) — Warehouse Intelligence
-Responsibility: Simulates customer demand by generating orders on a
-Poisson-distributed random interval with configurable priority mix.
-
-PEAS Formulation:
-    Performance: Order-generation realism, sustained arrival rate, priority mix.
-    Environment: Warehouse order queue, customer priority tiers (normal/urgent).
-    Actuators: place_order(sku, quantity, priority).
-    Sensors: Current queue length, delivery-time feedback.
-"""
 
 from __future__ import annotations
 

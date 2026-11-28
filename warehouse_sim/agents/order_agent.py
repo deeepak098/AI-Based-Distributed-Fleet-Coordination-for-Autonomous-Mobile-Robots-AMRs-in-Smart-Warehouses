@@ -1,16 +1,3 @@
-"""
-Order Management Agent — Prioritizes and decomposes incoming orders into tasks.
-
-Owner: Kalyan (cb.sc.u4cse23060) — Warehouse Intelligence
-Responsibility: Maintains a priority queue of orders, decomposes multi-item
-orders into per-shelf sub-tasks, and dispatches them to the Inventory Agent.
-
-PEAS Formulation:
-    Performance: Correct prioritization, task decomposition latency, zero dropped orders.
-    Environment: Incoming order stream, current task backlog.
-    Actuators: create_task(), set_priority(), dispatch_to_inventory_agent().
-    Sensors: Order queue, task-completion acknowledgements.
-"""
 
 from __future__ import annotations
 

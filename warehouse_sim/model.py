@@ -1,15 +1,3 @@
-"""
-Warehouse Simulation Engine — Mesa Model orchestrating all agents.
-
-Owner: Deepak (cb.sc.u4cse23019) & Kalyan (cb.sc.u4cse23050)
-Responsibility: Holds the 20x20 MultiGrid, instantiates all agent types,
-runs the staged scheduler (sense → decide → act), collects metrics via
-DataCollector, and logs inter-agent messages to simulation_log.jsonl.
-
-
-The model is the single source of truth for the warehouse state and is
-callable from both the CLI (main.py) and the Streamlit dashboard.
-"""
 
 from __future__ import annotations
 

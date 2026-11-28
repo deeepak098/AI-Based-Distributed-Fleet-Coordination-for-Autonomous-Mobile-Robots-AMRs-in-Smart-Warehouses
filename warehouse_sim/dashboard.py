@@ -1,8 +1,4 @@
-"""Viva-friendly Streamlit dashboard for the NEXUS warehouse simulation.
 
-This dashboard is a presentation layer only. It uses the existing WarehouseModel
-and event functions; it does not replace or modify simulation algorithms.
-"""
 from __future__ import annotations
 
 import os

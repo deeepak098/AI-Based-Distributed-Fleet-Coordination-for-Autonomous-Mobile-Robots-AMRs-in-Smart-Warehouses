@@ -1,16 +1,3 @@
-"""
-Robot Agent — Physical warehouse robot with state machine and battery management.
-
-Owner: Rohith (cb.sc.u4cse23018) — Robot Intelligence
-Responsibility: Executes assigned paths step-by-step, manages battery consumption,
-follows a 7-state FSM, and broadcasts telemetry to the Fleet Manager every tick.
-
-PEAS Formulation:
-    Performance: Task completion time, safe navigation, battery discipline.
-    Environment: Physical/simulated grid cell, shelf, packing station, charging dock.
-    Actuators: move(), pick(), drop(), dock_to_charge().
-    Sensors: Local grid occupancy, battery level, assigned route.
-"""
 
 from __future__ import annotations
 

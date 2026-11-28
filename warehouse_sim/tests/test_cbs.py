@@ -1,12 +1,3 @@
-"""
-Tests for Conflict-Based Search (CBS) Algorithm.
-
-Validates:
-1. Two robots with a guaranteed vertex conflict — resolved with zero collisions.
-2. Two robots with a guaranteed edge conflict (swap case) — resolved.
-3. CBS solution validation function works correctly.
-4. CBS returns None for impossible configurations.
-"""
 
 import pytest
 

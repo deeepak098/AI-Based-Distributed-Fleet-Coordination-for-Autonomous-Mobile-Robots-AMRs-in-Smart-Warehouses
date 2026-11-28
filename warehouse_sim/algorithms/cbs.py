@@ -1,19 +1,3 @@
-"""
-Conflict-Based Search (CBS) for Multi-Robot Path Planning.
-
-Owner: Rohith (cb.sc.u4cse23018) — Robot Intelligence
-Responsibility: Resolves multi-robot path conflicts optimally using a two-level
-search: high-level constraint tree + low-level constrained A* per robot.
-
-Algorithm Justification (vs. Priority-Based Planning):
-    Priority-based planning assigns fixed priorities to robots and plans
-    sequentially — higher-priority robots ignore lower ones. This can starve
-    low-priority robots indefinitely and produces suboptimal solutions.
-    CBS guarantees optimality under the sum-of-costs objective by systematically
-    exploring constraint alternatives. It avoids the joint-state explosion
-    (O(cells^robots)) by planning per-agent with constraints, making it
-    tractable for 5-10 robots on a 20x20 grid.
-"""
 
 from __future__ import annotations
 

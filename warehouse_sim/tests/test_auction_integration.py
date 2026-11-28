@@ -1,9 +1,4 @@
-"""Integration tests for the communication-based auction assignment handshake.
 
-These tests exercise the real WarehouseModel, FleetManagerAgent, RobotAgent,
-and CommunicationSystem together, with manual tick progression to make message
-ordering deterministic and independent of the simulation's unrelated agents.
-"""
 from warehouse_sim.model import WarehouseModel
 from warehouse_sim.agents.order_agent import Task
 
